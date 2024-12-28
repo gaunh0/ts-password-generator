@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2020", // Target JavaScript version
+    "module": "NodeNext", // Use Node.js native ESM and CJS module system
+    "moduleResolution": "nodenext", // Module resolution for Node.js environments
+    "strict": true, // Enable all strict type-checking options
+    "esModuleInterop": true, // Allow interoperability with CommonJS modules
+    "skipLibCheck": true, // Skip type checking of declaration files for faster builds
+    "forceConsistentCasingInFileNames": true, // Enforce consistent casing for file imports
+    "baseUrl": "./", // Base URL for module resolution
+    "rootDir": "src", // Root directory of input files
+    "outDir": "dist", // Output directory for compiled files
+    "paths": { // Map module imports
+      "*": [
+        "node_modules/*"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*" // Include all TypeScript files in the src folder
+  ],
+  "exclude": [
+    "node_modules", // Exclude node_modules
+    "dist" // Exclude output folder
+  ]
+}
