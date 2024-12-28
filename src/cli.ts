@@ -12,6 +12,19 @@ const symbols = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 /**
  * Generate a random password with the given options.
  */
+/**
+ * Generates a random password based on the given options.
+ * @param length - The desired length of the password.
+ * @param options - An object containing various password generation options:
+ *   - includeNumbers: Whether to include numbers in the password.
+ *   - includeLowercase: Whether to include lowercase letters.
+ *   - includeUppercase: Whether to include uppercase letters.
+ *   - includeSymbols: Whether to include symbols.
+ *   - beginWithLetter: Whether the password must begin with a letter.
+ *   - noDuplicateCharacters: Whether to avoid duplicate characters.
+ *   - noSequentialCharacters: Whether to avoid sequential characters (e.g., "abc" or "123").
+ * @returns The generated password as a string.
+ */
 function generatePassword(
     length: number,
     options: {
@@ -24,49 +37,57 @@ function generatePassword(
         noSequentialCharacters: boolean;
     }
 ): string {
-    let characters = '';
-    if (options.includeLowercase) characters += lettersLower;
-    if (options.includeUppercase) characters += lettersUpper;
-    if (options.includeNumbers) characters += numbers;
-    if (options.includeSymbols) characters += symbols;
+    let characters = ''; // Stores the allowed character set based on options.
 
+    // Build the character set based on the options.
+    if (options.includeLowercase) characters += lettersLower; // Add lowercase letters if allowed.
+    if (options.includeUppercase) characters += lettersUpper; // Add uppercase letters if allowed.
+    if (options.includeNumbers) characters += numbers; // Add numbers if allowed.
+    if (options.includeSymbols) characters += symbols; // Add symbols if allowed.
+
+    // Throw an error if no character sets are selected.
     if (characters.length === 0) {
         throw new Error('No character sets selected!');
     }
 
-    let password = '';
-    const usedChars = new Set<string>();
+    let password = ''; // Stores the final generated password.
+    const usedChars = new Set<string>(); // Keeps track of characters already used (to avoid duplicates).
 
+    // Generate the password character by character.
     for (let i = 0; i < length; i++) {
         let char = '';
-        do {
-            char = characters.charAt(Math.floor(Math.random() * characters.length));
-        } while (
-            options.noDuplicateCharacters && usedChars.has(char)
-        );
 
+        // Ensure no duplicate characters if the option is selected.
+        do {
+            char = characters.charAt(Math.floor(Math.random() * characters.length)); // Pick a random character.
+        } while (options.noDuplicateCharacters && usedChars.has(char)); // Retry if duplicates are not allowed.
+
+        // Check for sequential characters if the option is selected.
         if (options.noSequentialCharacters && i > 0) {
-            const lastChar = password.charAt(password.length - 1);
-            const charCodeDiff = char.charCodeAt(0) - lastChar.charCodeAt(0);
-            if (Math.abs(charCodeDiff) === 1) continue; // Skip sequential characters
+            const lastChar = password.charAt(password.length - 1); // Get the last character in the password.
+            const charCodeDiff = char.charCodeAt(0) - lastChar.charCodeAt(0); // Calculate the difference in char codes.
+            if (Math.abs(charCodeDiff) === 1) continue; // Skip if the character is sequential.
         }
 
+        // Add the character to the password and mark it as used (if avoiding duplicates).
         if (options.noDuplicateCharacters) usedChars.add(char);
         password += char;
     }
 
-    // Ensure the password begins with a letter if required
+    // Ensure the password begins with a letter if the option is selected.
     if (options.beginWithLetter && !/^[a-zA-Z]/.test(password)) {
-        const letterSet = (options.includeLowercase ? lettersLower : '') +
-            (options.includeUppercase ? lettersUpper : '');
+        const letterSet = (options.includeLowercase ? lettersLower : '') + (options.includeUppercase ? lettersUpper : '');
+        // If no letters are available, throw an error.
         if (letterSet.length === 0) {
             throw new Error('No letters available to begin the password!');
         }
+        // Replace the first character with a random letter.
         password = letterSet.charAt(Math.floor(Math.random() * letterSet.length)) + password.slice(1);
     }
 
-    return password;
+    return password; // Return the final password.
 }
+
 
 // Prompt user for options using Inquirer
 inquirer
